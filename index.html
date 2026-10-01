@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Apprenticeship Tracker</title>
+<style>
+  :root {
+    --ink: #1b2430;
+    --ink-soft: #5a6472;
+    --paper: #f7f5f0;
+    --card: #ffffff;
+    --line: #dfdad0;
+    --accent: #2f5d50;
+    --accent-soft: #e4ece9;
+    --done: #2f5d50;
+    --upcoming: #c9c2b4;
+    box-sizing: border-box;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #eee9df;
+      --ink-soft: #a9a297;
+      --paper: #17191b;
+      --card: #1f2224;
+      --line: #34383a;
+      --accent: #7fb5a3;
+      --accent-soft: #24302c;
+      --done: #7fb5a3;
+      --upcoming: #3d4144;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #eee9df;
+    --ink-soft: #a9a297;
+    --paper: #17191b;
+    --card: #1f2224;
+    --line: #34383a;
+    --accent: #7fb5a3;
+    --accent-soft: #24302c;
+    --done: #7fb5a3;
+    --upcoming: #3d4144;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    min-height: 100%;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 40px 20px 80px; }
+
+  header { margin-bottom: 32px; }
+  h1 {
+    font-size: 1.9rem;
+    margin: 0 0 4px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .sub { color: var(--ink-soft); font-size: 0.95rem; margin: 0; }
+
+  .add-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .add-row input {
+    flex: 1 1 160px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--ink);
+  }
+  .add-row button {
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 10px 18px;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--paper);
+    cursor: pointer;
+  }
+  .add-row button:hover { opacity: 0.92; }
+
+  .empty {
+    border: 1px dashed var(--line);
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--ink-soft);
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+  }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .card-head .names { min-width: 0; }
+  .card-head .company {
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+  .card-head .role {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+  }
+  .remove-btn {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    text-decoration: underline;
+    padding: 2px;
+    white-space: nowrap;
+  }
+  .remove-btn:hover { color: var(--ink); }
+
+  .stages {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+  }
+  .stage {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    cursor: pointer;
+    padding-top: 4px;
+  }
+  .stage .dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--upcoming);
+    margin: 0 auto 8px;
+    border: 2px solid var(--upcoming);
+    position: relative;
+    z-index: 1;
+  }
+  .stage.done .dot { background: var(--done); border-color: var(--done); }
+  .stage.current .dot {
+    background: var(--paper);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .stage .line {
+    position: absolute;
+    top: 10px;
+    left: -50%;
+    width: 100%;
+    height: 2px;
+    background: var(--upcoming);
+    z-index: 0;
+  }
+  .stage:first-child .line { display: none; }
+  .stage.done .line, .stage.current .line { background: var(--done); }
+  .stage label {
+    font-size: 0.72rem;
+    color: var(--ink-soft);
+    line-height: 1.25;
+    display: block;
+  }
+  .stage.current label { color: var(--ink); font-weight: 600; }
+
+  .status-row {
+    margin-top: 14px;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+  .status-row.offer { color: var(--accent); font-weight: 600; }
+  .status-row.rejected { color: #a4574a; font-weight: 600; }
+
+  .date-row {
+    margin-top: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .date-row label {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  .date-row input[type="date"] {
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .date-row .clear-date {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    text-decoration: underline;
+    font-family: inherit;
+    font-size: 0.78rem;
+    cursor: pointer;
+    padding: 2px;
+  }
+  .upcoming-date {
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  .outcome-buttons {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .outcome-buttons button {
+    font-family: inherit;
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .outcome-buttons button.active-offer {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .outcome-buttons button.active-rejected {
+    background: #f1e2df;
+    border-color: #a4574a;
+    color: #a4574a;
+  }
+
+  @media (max-width: 480px) {
+    .stage label { font-size: 0.62rem; }
+  }
+
+  #reminderBanner {
+    display: none;
+    background: var(--accent-soft);
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 24px;
+  }
+  .reminder-title {
+    font-size: 0.78rem;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .reminder-item {
+    font-size: 0.88rem;
+    color: var(--ink);
+    padding: 3px 0;
+  }
+
+  .details-row {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 8px 10px;
+    align-items: start;
+  }
+  .details-label {
+    font-size: 0.82rem;
+    color: var(--ink-soft);
+    padding-top: 8px;
+    white-space: nowrap;
+  }
+  .details-row input[type="url"],
+  .details-row textarea {
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+    width: 100%;
+  }
+  .details-row textarea {
+    min-height: 54px;
+    resize: vertical;
+  }
+  .link-wrap {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .open-link {
+    font-size: 0.8rem;
+    color: var(--accent);
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .open-link:hover { text-decoration: underline; }
+
+  #loginScreen {
+    max-width: 340px;
+    margin: 80px auto;
+    text-align: center;
+  }
+  #loginScreen h2 {
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+  }
+  #loginScreen p {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    margin-top: 0;
+    margin-bottom: 24px;
+  }
+  #loginScreen input {
+    display: block;
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--ink);
+  }
+  #loginScreen button {
+    width: 100%;
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 10px 18px;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--paper);
+    cursor: pointer;
+  }
+  #loginError {
+    color: #a4574a;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    min-height: 1.2em;
+  }
+  #signOutBtn {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    text-decoration: underline;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    float: right;
+    margin-top: 6px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div id="loginScreen">
+    <h2>Apprenticeship Tracker</h2>
+    <p>Sign in to view and edit your applications.</p>
+    <input type="email" id="loginEmail" placeholder="Email" autocomplete="username">
+    <input type="password" id="loginPassword" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn">Sign in</button>
+    <div id="loginError"></div>
+  </div>
+
+  <div id="appContent" style="display:none;">
+  <header>
+    <button id="signOutBtn">Sign out</button>
+    <h1>Apprenticeship Tracker</h1>
+    <p class="sub">Track each application by stage — tap a stage to update it.</p>
+  </header>
+
+  <div id="configWarning" style="display:none; background:#f1e2df; border:1px solid #a4574a; color:#a4574a; border-radius:8px; padding:12px 16px; margin-bottom:24px; font-size:0.9rem;">
+    This file isn't connected yet — open it in a text editor, find <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> near the top of the script, and paste in your project's values. Until then nothing will save.
+  </div>
+
+  <div id="reminderBanner"></div>
+
+  <div class="add-row">
+    <input type="text" id="companyInput" placeholder="Company name">
+    <input type="text" id="roleInput" placeholder="Role / scheme name">
+    <button id="addBtn">Add application</button>
+  </div>
+
+  <div id="cardsContainer"><div class="card"><div class="card-head">
+      <div class="names">
+        <div class="company">M group</div>
+        <div class="role">Degree Apprentice Civil Design Engineer</div>
+      </div>
+      <button class="remove-btn" data-id="muoh22dqnf95q">Remove</button>
+    </div><div class="stages"><div class="stage current" data-id="muoh22dqnf95q" data-stage="0"><div class="line"></div><div class="dot"></div><label>Researching</label></div><div class="stage" data-id="muoh22dqnf95q" data-stage="1"><div class="line"></div><div class="dot"></div><label>Applied</label></div><div class="stage" data-id="muoh22dqnf95q" data-stage="2"><div class="line"></div><div class="dot"></div><label>Online Tests</label></div><div class="stage" data-id="muoh22dqnf95q" data-stage="3"><div class="line"></div><div class="dot"></div><label>Assessment Centre</label></div><div class="stage" data-id="muoh22dqnf95q" data-stage="4"><div class="line"></div><div class="dot"></div><label>Interview</label></div></div><div class="status-row">Current stage: Researching</div><div class="date-row">
+      <label for="date-muoh22dqnf95q">Date for Researching:</label>
+      <input type="date" id="date-muoh22dqnf95q" data-id="muoh22dqnf95q" class="date-input" value="">
+      
+    </div><div class="details-row">
+      <label class="details-label" for="link-muoh22dqnf95q">Link</label>
+      <div class="link-wrap"><input type="url" id="link-muoh22dqnf95q" data-id="muoh22dqnf95q" class="link-input" placeholder="https://..." value=""></div>
+      <label class="details-label" for="notes-muoh22dqnf95q">Notes</label>
+      <textarea id="notes-muoh22dqnf95q" data-id="muoh22dqnf95q" class="notes-input" placeholder="Contact name, salary, things to remember..."></textarea>
+    </div><div class="outcome-buttons">
+      <button data-id="muoh22dqnf95q" data-outcome="offer" class="">Mark offer received</button>
+      <button data-id="muoh22dqnf95q" data-outcome="rejected" class="">Mark unsuccessful</button>
+      <button data-id="muoh22dqnf95q" data-outcome="none">Clear outcome</button>
+    </div></div></div>
+  <div class="empty" id="emptyState" style="display: none;">No applications yet — add one above to start tracking.</div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// ======= PASTE YOUR SUPABASE DETAILS HERE =======
+// From Project Settings -> Data API in your Supabase project.
+const SUPABASE_URL = "https://yznitzulpapjagyzjmyz.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6bml0enVscGFwamFneXpqbXl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3OTE1NzUsImV4cCI6MjEwNjM2NzU3NX0.owpW2xX4TfqtYxEa95dqXB8_JqcotG7oLnDBzhMUt1w";
+// ==================================================
+
+const STAGES = [
+  "Researching",
+  "Applied",
+  "Online Tests",
+  "Assessment Centre",
+  "Interview"
+];
+
+let state = { applications: [] };
+let db = null;
+let configured = SUPABASE_URL.startsWith("http") && SUPABASE_ANON_KEY.length > 20;
+
+if (configured) {
+  db = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} else {
+  console.warn("Supabase isn't configured yet — add your URL and anon key at the top of the script.");
+}
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function sortForDisplay(apps) {
+  return apps
+    .map((a, idx) => ({ a, idx }))
+    .sort((x, y) => {
+      const aFinished = x.a.outcome !== 'none';
+      const bFinished = y.a.outcome !== 'none';
+      if (aFinished !== bFinished) return aFinished ? 1 : -1;
+
+      const aHas = !!x.a.date;
+      const bHas = !!y.a.date;
+      if (aHas && bHas) {
+        if (x.a.date !== y.a.date) return x.a.date < y.a.date ? -1 : 1;
+        return x.idx - y.idx;
+      }
+      if (aHas !== bHas) return aHas ? -1 : 1;
+      return x.idx - y.idx;
+    })
+    .map(o => o.a);
+}
+
+function getReminders() {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const items = [];
+  state.applications.forEach(app => {
+    if (app.outcome !== 'none' || !app.date) return;
+    const d = new Date(app.date + 'T00:00:00');
+    const diffDays = Math.round((d - today) / 86400000);
+    if (diffDays >= 0 && diffDays <= 7) items.push({ app, diffDays });
+  });
+  items.sort((a, b) => a.diffDays - b.diffDays);
+  return items;
+}
+
+function renderReminders() {
+  const banner = document.getElementById('reminderBanner');
+  const items = getReminders();
+  if (items.length === 0) {
+    banner.style.display = 'none';
+    banner.innerHTML = '';
+    return;
+  }
+  banner.style.display = 'block';
+  const rows = items.map(({ app, diffDays }) => {
+    const when = diffDays === 0 ? 'today' : diffDays === 1 ? 'tomorrow' : `in ${diffDays} days`;
+    return `<div class="reminder-item">${escapeHtml(STAGES[app.stageIndex])} with <strong>${escapeHtml(app.company)}</strong> — ${when} (${formatDate(app.date)})</div>`;
+  }).join('');
+  banner.innerHTML = `<div class="reminder-title">Coming up</div>${rows}`;
+}
+
+function render() {
+  const container = document.getElementById('cardsContainer');
+  const empty = document.getElementById('emptyState');
+  container.innerHTML = '';
+  renderReminders();
+
+  if (state.applications.length === 0) {
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  sortForDisplay(state.applications).forEach(app => {
+    const card = document.createElement('div');
+    card.className = 'card';
+
+    const head = document.createElement('div');
+    head.className = 'card-head';
+    head.innerHTML = `
+      <div class="names">
+        <div class="company">${escapeHtml(app.company)}</div>
+        <div class="role">${escapeHtml(app.role || '')}</div>
+      </div>
+      <button class="remove-btn" data-id="${app.id}">Remove</button>
+    `;
+    card.appendChild(head);
+
+    const stagesEl = document.createElement('div');
+    stagesEl.className = 'stages';
+    STAGES.forEach((label, i) => {
+      const s = document.createElement('div');
+      let cls = 'stage';
+      if (i < app.stageIndex) cls += ' done';
+      else if (i === app.stageIndex) cls += ' current';
+      s.className = cls;
+      s.dataset.id = app.id;
+      s.dataset.stage = i;
+      s.innerHTML = `<div class="line"></div><div class="dot"></div><label>${label}</label>`;
+      stagesEl.appendChild(s);
+    });
+    card.appendChild(stagesEl);
+
+    const statusRow = document.createElement('div');
+    let statusClass = 'status-row';
+    let statusText = `Current stage: ${STAGES[app.stageIndex]}`;
+    if (app.outcome === 'offer') { statusClass += ' offer'; statusText = 'Offer received'; }
+    if (app.outcome === 'rejected') { statusClass += ' rejected'; statusText = 'Not successful'; }
+    statusRow.className = statusClass;
+    statusRow.textContent = statusText;
+    card.appendChild(statusRow);
+
+    if (app.date) {
+      const dateDisplay = document.createElement('div');
+      dateDisplay.className = 'upcoming-date';
+      dateDisplay.textContent = `${STAGES[app.stageIndex]} date: ${formatDate(app.date)}`;
+      card.appendChild(dateDisplay);
+    }
+
+    const dateRow = document.createElement('div');
+    dateRow.className = 'date-row';
+    dateRow.innerHTML = `
+      <label for="date-${app.id}">Date for ${STAGES[app.stageIndex]}:</label>
+      <input type="date" id="date-${app.id}" data-id="${app.id}" class="date-input" value="${app.date || ''}">
+      ${app.date ? `<button class="clear-date" data-id="${app.id}">Clear</button>` : ''}
+    `;
+    card.appendChild(dateRow);
+
+    const detailsRow = document.createElement('div');
+    detailsRow.className = 'details-row';
+    detailsRow.innerHTML = `
+      <label class="details-label" for="link-${app.id}">Link</label>
+      <div class="link-wrap">
+        <input type="url" id="link-${app.id}" data-id="${app.id}" class="link-input" placeholder="https://..." value="${escapeHtml(app.link || '')}">
+        ${app.link ? `<a class="open-link" href="${escapeHtml(app.link)}" target="_blank" rel="noopener">Open ↗</a>` : ''}
+      </div>
+      <label class="details-label" for="notes-${app.id}">Notes</label>
+      <textarea id="notes-${app.id}" data-id="${app.id}" class="notes-input" placeholder="Contact name, salary, things to remember...">${escapeHtml(app.notes || '')}</textarea>
+    `;
+    card.appendChild(detailsRow);
+
+    const outcomeRow = document.createElement('div');
+    outcomeRow.className = 'outcome-buttons';
+    outcomeRow.innerHTML = `
+      <button data-id="${app.id}" data-outcome="offer" class="${app.outcome==='offer'?'active-offer':''}">Mark offer received</button>
+      <button data-id="${app.id}" data-outcome="rejected" class="${app.outcome==='rejected'?'active-rejected':''}">Mark unsuccessful</button>
+      <button data-id="${app.id}" data-outcome="none">Clear outcome</button>
+    `;
+    card.appendChild(outcomeRow);
+
+    container.appendChild(card);
+  });
+}
+
+function formatDate(iso) {
+  const d = new Date(iso + 'T00:00:00');
+  if (isNaN(d)) return iso;
+  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+
+async function persist() {
+  if (!db || !currentUserId) return;
+  try {
+    const { error } = await db
+      .from('tracker_state')
+      .update({ data: state, updated_at: new Date().toISOString() })
+      .eq('owner_id', currentUserId);
+    if (error) console.error('Save failed', error);
+  } catch (e) {
+    console.error('Save failed', e);
+  }
+}
+
+document.getElementById('addBtn').addEventListener('click', () => {
+  const companyInput = document.getElementById('companyInput');
+  const roleInput = document.getElementById('roleInput');
+  const company = companyInput.value.trim();
+  const role = roleInput.value.trim();
+  if (!company) { companyInput.focus(); return; }
+  state.applications.push({ id: uid(), company, role, stageIndex: 0, outcome: 'none', date: '', link: '', notes: '' });
+  companyInput.value = '';
+  roleInput.value = '';
+  render();
+  persist();
+});
+
+document.getElementById('cardsContainer').addEventListener('change', (e) => {
+  const dateInput = e.target.closest('.date-input');
+  if (dateInput) {
+    const app = state.applications.find(a => a.id === dateInput.dataset.id);
+    if (app) {
+      app.date = dateInput.value;
+      render();
+      persist();
+    }
+  }
+});
+
+// Notes and link fields update state as you type, but only re-render
+// and save once you click away — re-rendering every keystroke would
+// throw focus out of the field.
+document.getElementById('cardsContainer').addEventListener('input', (e) => {
+  const notesEl = e.target.closest('.notes-input');
+  if (notesEl) {
+    const app = state.applications.find(a => a.id === notesEl.dataset.id);
+    if (app) app.notes = notesEl.value;
+    return;
+  }
+  const linkEl = e.target.closest('.link-input');
+  if (linkEl) {
+    const app = state.applications.find(a => a.id === linkEl.dataset.id);
+    if (app) app.link = linkEl.value;
+  }
+});
+
+document.getElementById('cardsContainer').addEventListener('blur', (e) => {
+  if (!e.target.classList) return;
+  if (e.target.classList.contains('notes-input') || e.target.classList.contains('link-input')) {
+    render();
+    persist();
+  }
+}, true);
+
+document.getElementById('cardsContainer').addEventListener('click', (e) => {
+  const clearBtn = e.target.closest('.clear-date');
+  if (clearBtn) {
+    const app = state.applications.find(a => a.id === clearBtn.dataset.id);
+    if (app) {
+      app.date = '';
+      render();
+      persist();
+    }
+    return;
+  }
+  const stageEl = e.target.closest('.stage');
+  if (stageEl) {
+    const app = state.applications.find(a => a.id === stageEl.dataset.id);
+    if (app) {
+      app.stageIndex = parseInt(stageEl.dataset.stage, 10);
+      render();
+      persist();
+    }
+    return;
+  }
+  const outcomeBtn = e.target.closest('[data-outcome]');
+  if (outcomeBtn) {
+    const app = state.applications.find(a => a.id === outcomeBtn.dataset.id);
+    if (app) {
+      app.outcome = outcomeBtn.dataset.outcome;
+      render();
+      persist();
+    }
+    return;
+  }
+  const removeBtn = e.target.closest('.remove-btn');
+  if (removeBtn) {
+    state.applications = state.applications.filter(a => a.id !== removeBtn.dataset.id);
+    render();
+    persist();
+  }
+});
+
+let currentUserId = null;
+
+async function loadFromCloud() {
+  if (!db || !currentUserId) {
+    document.getElementById('configWarning').style.display = 'block';
+    render();
+    return;
+  }
+  try {
+    const { data: row, error } = await db
+      .from('tracker_state')
+      .select('data')
+      .eq('owner_id', currentUserId)
+      .maybeSingle();
+    if (error) {
+      console.error('Load failed', error);
+    } else if (row && row.data && Array.isArray(row.data.applications)) {
+      state = row.data;
+    } else {
+      // First time this person has signed in — create their own row.
+      state = { applications: [] };
+      const { error: insertError } = await db
+        .from('tracker_state')
+        .insert({ id: currentUserId, owner_id: currentUserId, data: state });
+      if (insertError) console.error('Could not create your row', insertError);
+    }
+  } catch (e) {
+    console.error('Load failed', e);
+  }
+  render();
+}
+
+async function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appContent').style.display = 'block';
+  const { data } = await db.auth.getUser();
+  currentUserId = data.user ? data.user.id : null;
+  loadFromCloud();
+}
+
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'block';
+  document.getElementById('appContent').style.display = 'none';
+}
+
+async function attemptLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const errEl = document.getElementById('loginError');
+  errEl.textContent = '';
+  if (!db) {
+    errEl.textContent = "Can't sign in — Supabase isn't configured in this file yet.";
+    return;
+  }
+  if (!email || !password) {
+    errEl.textContent = 'Enter both email and password.';
+    return;
+  }
+  const { error } = await db.auth.signInWithPassword({ email, password });
+  if (error) {
+    errEl.textContent = 'Sign-in failed — check your email and password.';
+    return;
+  }
+  showApp();
+}
+
+if (db) {
+  document.getElementById('loginBtn').addEventListener('click', attemptLogin);
+  document.getElementById('loginPassword').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') attemptLogin();
+  });
+  document.getElementById('signOutBtn').addEventListener('click', async () => {
+    await db.auth.signOut();
+    currentUserId = null;
+    state = { applications: [] };
+    showLogin();
+  });
+
+  // Supabase remembers the session in this browser, so re-opening the
+  // file later signs you back in automatically without retyping anything.
+  db.auth.getSession().then(({ data }) => {
+    if (data.session) {
+      showApp();
+    } else {
+      showLogin();
+    }
+  });
+} else {
+  // Not configured yet — show the tracker area with its own warning
+  // rather than a login screen that can't possibly work.
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appContent').style.display = 'block';
+  loadFromCloud();
+}
+</script>
+
+
+</body></html>
