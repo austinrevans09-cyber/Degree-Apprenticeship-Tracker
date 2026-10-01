@@ -422,6 +422,60 @@
   }
   .archive-btn:hover { color: var(--ink); }
 
+  .find-section {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin-bottom: 24px;
+  }
+  .find-section h2 {
+    font-size: 1rem;
+    margin: 0 0 4px;
+  }
+  .find-section p {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin: 0 0 12px;
+  }
+  .find-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+  }
+  .find-row input {
+    flex: 1 1 180px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .find-row button {
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 9px 16px;
+    border: 1px solid var(--accent);
+    border-radius: 6px;
+    background: var(--accent);
+    color: var(--paper);
+    cursor: pointer;
+  }
+  .find-links {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .find-links a {
+    font-size: 0.82rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .find-links a:hover { text-decoration: underline; }
+
   #archivedToggleWrap {
     margin: 10px 0 20px;
   }
@@ -499,7 +553,7 @@
     margin-top: 10px;
     min-height: 1.2em;
   }
-  #signOutBtn {
+  #signOutBtn, #themeToggleBtn {
     background: none;
     border: none;
     color: var(--ink-soft);
@@ -509,6 +563,54 @@
     cursor: pointer;
     float: right;
     margin-top: 6px;
+    margin-left: 14px;
+  }
+
+  .theme-panel {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin: 16px 0 24px;
+    clear: both;
+  }
+  .theme-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+  }
+  .theme-row:last-child { margin-bottom: 0; }
+  .theme-label {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    flex: 0 0 60px;
+  }
+  .swatches { display: flex; gap: 8px; }
+  .swatch {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    padding: 0;
+  }
+  .swatch.active { border-color: var(--ink); }
+  .mode-buttons { display: flex; gap: 6px; }
+  .mode-buttons button {
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .mode-buttons button.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
   }
 </style>
 </head>
@@ -527,15 +629,45 @@
   <div id="appContent" style="display:none;">
   <header>
     <button id="signOutBtn">Sign out</button>
+    <button id="themeToggleBtn">Customise</button>
     <h1>Apprenticeship Tracker</h1>
     <p class="sub">Track each application by stage — tap a stage to update it.</p>
   </header>
+
+  <div id="themePanel" class="theme-panel" style="display:none;">
+    <div class="theme-row">
+      <span class="theme-label">Colour</span>
+      <div class="swatches" id="swatchRow"></div>
+    </div>
+    <div class="theme-row">
+      <span class="theme-label">Mode</span>
+      <div class="mode-buttons" id="modeRow">
+        <button data-mode="light">Light</button>
+        <button data-mode="dark">Dark</button>
+        <button data-mode="auto">Auto</button>
+      </div>
+    </div>
+  </div>
 
   <div id="configWarning" style="display:none; background:#f1e2df; border:1px solid #a4574a; color:#a4574a; border-radius:8px; padding:12px 16px; margin-bottom:24px; font-size:0.9rem;">
     This file isn't connected yet — open it in a text editor, find <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> near the top of the script, and paste in your project's values. Until then nothing will save.
   </div>
 
   <div id="reminderBanner"></div>
+
+  <div class="find-section">
+    <h2>Find apprenticeships</h2>
+    <p>Opens real listings in a new tab, search term already filled in.</p>
+    <div class="find-row">
+      <input type="text" id="findInput" placeholder="e.g. engineering, or a company name">
+      <button id="findBtn">Search</button>
+    </div>
+    <div class="find-links">
+      <a href="https://www.findapprenticeship.service.gov.uk/apprenticeshipsearch" target="_blank" rel="noopener">Browse on gov.uk ↗</a>
+      <a href="https://www.ratemyapprenticeship.co.uk/search-apprenticeships?degree-apprenticeships=true" target="_blank" rel="noopener">RateMyApprenticeship ↗</a>
+      <a href="https://www.ucas.com/apprenticeships" target="_blank" rel="noopener">UCAS Apprenticeships ↗</a>
+    </div>
+  </div>
 
   <div id="statsBar" class="stats-bar"></div>
 
@@ -565,6 +697,73 @@
 const SUPABASE_URL = "https://yznitzulpapjagyzjmyz.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl6bml0enVscGFwamFneXpqbXl6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA3OTE1NzUsImV4cCI6MjEwNjM2NzU3NX0.owpW2xX4TfqtYxEa95dqXB8_JqcotG7oLnDBzhMUt1w";
 // ==================================================
+
+const THEME_PRESETS = {
+  teal:   { accent: '#2f5d50', softLight: '#e4ece9', softDark: '#24302c' },
+  blue:   { accent: '#2a5d8a', softLight: '#e2ebf2', softDark: '#1f2d38' },
+  purple: { accent: '#6b4c93', softLight: '#ece6f2', softDark: '#2b2436' },
+  orange: { accent: '#b5651d', softLight: '#f3e6d8', softDark: '#332419' },
+  rose:   { accent: '#a4574a', softLight: '#f1e2df', softDark: '#332220' },
+  green:  { accent: '#3f7d4f', softLight: '#e3efe5', softDark: '#223527' }
+};
+
+function isDarkMode(mode) {
+  if (mode === 'dark') return true;
+  if (mode === 'light') return false;
+  return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function applyTheme() {
+  const t = state.theme || { accentKey: 'teal', mode: 'auto' };
+  const preset = THEME_PRESETS[t.accentKey] || THEME_PRESETS.teal;
+  const root = document.documentElement;
+  root.style.setProperty('--accent', preset.accent);
+  root.style.setProperty('--done', preset.accent);
+  root.style.setProperty('--accent-soft', isDarkMode(t.mode) ? preset.softDark : preset.softLight);
+  if (t.mode === 'light') root.setAttribute('data-theme', 'light');
+  else if (t.mode === 'dark') root.setAttribute('data-theme', 'dark');
+  else root.removeAttribute('data-theme');
+}
+
+function renderThemePanel() {
+  const t = state.theme || { accentKey: 'teal', mode: 'auto' };
+  const swatchRow = document.getElementById('swatchRow');
+  swatchRow.innerHTML = Object.entries(THEME_PRESETS).map(([key, p]) =>
+    `<button class="swatch${t.accentKey === key ? ' active' : ''}" data-key="${key}" style="background:${p.accent};" title="${key}"></button>`
+  ).join('');
+  document.querySelectorAll('#modeRow button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === t.mode);
+  });
+}
+
+document.getElementById('themeToggleBtn').addEventListener('click', () => {
+  const panel = document.getElementById('themePanel');
+  const open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  if (!open) renderThemePanel();
+});
+
+document.getElementById('swatchRow').addEventListener('click', (e) => {
+  const sw = e.target.closest('.swatch');
+  if (!sw) return;
+  state.theme = Object.assign({ accentKey: 'teal', mode: 'auto' }, state.theme, { accentKey: sw.dataset.key });
+  applyTheme();
+  renderThemePanel();
+  persist();
+});
+
+document.getElementById('modeRow').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-mode]');
+  if (!btn) return;
+  state.theme = Object.assign({ accentKey: 'teal', mode: 'auto' }, state.theme, { mode: btn.dataset.mode });
+  applyTheme();
+  renderThemePanel();
+  persist();
+});
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if ((state.theme || {}).mode === 'auto') applyTheme();
+});
 
 const STAGES = [
   "Researching",
@@ -916,6 +1115,17 @@ document.getElementById('cardsContainer').addEventListener('blur', (e) => {
   }
 }, true);
 
+function runApprenticeshipSearch() {
+  const term = document.getElementById('findInput').value.trim();
+  const query = term ? `degree apprenticeship ${term}` : 'degree apprenticeship';
+  const url = `https://www.google.com/search?q=${encodeURIComponent(query)}+site:findapprenticeship.service.gov.uk`;
+  window.open(url, '_blank', 'noopener');
+}
+document.getElementById('findBtn').addEventListener('click', runApprenticeshipSearch);
+document.getElementById('findInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') runApprenticeshipSearch();
+});
+
 document.getElementById('searchInput').addEventListener('input', (e) => {
   searchQuery = e.target.value;
   render();
@@ -1069,7 +1279,7 @@ async function loadFromCloud() {
       state = row.data;
     } else {
       // First time this person has signed in — create their own row.
-      state = { applications: [] };
+      state = { applications: [], theme: { accentKey: 'teal', mode: 'auto' } };
       const { error: insertError } = await db
         .from('tracker_state')
         .insert({ id: currentUserId, owner_id: currentUserId, data: state });
@@ -1078,6 +1288,8 @@ async function loadFromCloud() {
   } catch (e) {
     console.error('Load failed', e);
   }
+  if (!state.theme) state.theme = { accentKey: 'teal', mode: 'auto' };
+  applyTheme();
   render();
 }
 
