@@ -320,6 +320,141 @@
   }
   .open-link:hover { text-decoration: underline; }
 
+  .stats-bar {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    margin-bottom: 18px;
+  }
+  .stats-bar strong { color: var(--ink); }
+
+  .search-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .search-row input[type="text"] {
+    flex: 1 1 180px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--ink);
+  }
+  .notify-btn {
+    font-family: inherit;
+    font-size: 0.8rem;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink-soft);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .notify-btn:hover { color: var(--ink); }
+
+  .edit-btn {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: inherit;
+    text-decoration: underline;
+    padding: 2px;
+    margin-right: 10px;
+    white-space: nowrap;
+  }
+  .edit-btn:hover { color: var(--ink); }
+  .name-edit input {
+    font-family: inherit;
+    font-size: 0.95rem;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--paper);
+    color: var(--ink);
+    width: 100%;
+    margin-bottom: 6px;
+  }
+  .name-edit .save-name-btn {
+    font-family: inherit;
+    font-size: 0.78rem;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--accent);
+    background: var(--accent);
+    color: var(--paper);
+    cursor: pointer;
+  }
+
+  .history-details {
+    margin-top: 12px;
+    font-size: 0.82rem;
+  }
+  .history-details summary {
+    cursor: pointer;
+    color: var(--ink-soft);
+  }
+  .history-details summary:hover { color: var(--ink); }
+  .history-item {
+    padding: 4px 0 4px 6px;
+    color: var(--ink-soft);
+  }
+
+  .archive-btn {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    text-decoration: underline;
+    padding: 2px;
+    white-space: nowrap;
+  }
+  .archive-btn:hover { color: var(--ink); }
+
+  #archivedToggleWrap {
+    margin: 10px 0 20px;
+  }
+  #archivedToggleWrap button {
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-family: inherit;
+    text-decoration: underline;
+    padding: 2px;
+  }
+  .archived-card {
+    opacity: 0.75;
+  }
+  .archived-actions {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+  .archived-actions button {
+    font-family: inherit;
+    font-size: 0.78rem;
+    padding: 6px 12px;
+    border-radius: 14px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .archived-actions .delete-forever { color: #a4574a; border-color: #a4574a; }
+
   #loginScreen {
     max-width: 340px;
     margin: 80px auto;
@@ -402,33 +537,24 @@
 
   <div id="reminderBanner"></div>
 
+  <div id="statsBar" class="stats-bar"></div>
+
+  <div class="search-row">
+    <input type="text" id="searchInput" placeholder="Search by company...">
+    <button id="notifyBtn" class="notify-btn" style="display:none;">Enable reminders (while this tab is open)</button>
+  </div>
+
   <div class="add-row">
     <input type="text" id="companyInput" placeholder="Company name">
     <input type="text" id="roleInput" placeholder="Role / scheme name">
     <button id="addBtn">Add application</button>
   </div>
 
-  <div id="cardsContainer"><div class="card"><div class="card-head">
-      <div class="names">
-        <div class="company">M group</div>
-        <div class="role">Degree Apprentice Civil Design Engineer</div>
-      </div>
-      <button class="remove-btn" data-id="muoh22dqnf95q">Remove</button>
-    </div><div class="stages"><div class="stage current" data-id="muoh22dqnf95q" data-stage="0"><div class="line"></div><div class="dot"></div><label>Researching</label></div><div class="stage" data-id="muoh22dqnf95q" data-stage="1"><div class="line"></div><div class="dot"></div><label>Applied</label></div><div class="stage" data-id="muoh22dqnf95q" data-stage="2"><div class="line"></div><div class="dot"></div><label>Online Tests</label></div><div class="stage" data-id="muoh22dqnf95q" data-stage="3"><div class="line"></div><div class="dot"></div><label>Assessment Centre</label></div><div class="stage" data-id="muoh22dqnf95q" data-stage="4"><div class="line"></div><div class="dot"></div><label>Interview</label></div></div><div class="status-row">Current stage: Researching</div><div class="date-row">
-      <label for="date-muoh22dqnf95q">Date for Researching:</label>
-      <input type="date" id="date-muoh22dqnf95q" data-id="muoh22dqnf95q" class="date-input" value="">
-      
-    </div><div class="details-row">
-      <label class="details-label" for="link-muoh22dqnf95q">Link</label>
-      <div class="link-wrap"><input type="url" id="link-muoh22dqnf95q" data-id="muoh22dqnf95q" class="link-input" placeholder="https://..." value=""></div>
-      <label class="details-label" for="notes-muoh22dqnf95q">Notes</label>
-      <textarea id="notes-muoh22dqnf95q" data-id="muoh22dqnf95q" class="notes-input" placeholder="Contact name, salary, things to remember..."></textarea>
-    </div><div class="outcome-buttons">
-      <button data-id="muoh22dqnf95q" data-outcome="offer" class="">Mark offer received</button>
-      <button data-id="muoh22dqnf95q" data-outcome="rejected" class="">Mark unsuccessful</button>
-      <button data-id="muoh22dqnf95q" data-outcome="none">Clear outcome</button>
-    </div></div></div>
+  <div id="cardsContainer"></div>
   <div class="empty" id="emptyState" style="display: none;">No applications yet — add one above to start tracking.</div>
+
+  <div id="archivedToggleWrap"></div>
+  <div id="archivedSection" style="display:none;"></div>
   </div>
 </div>
 
@@ -512,31 +638,121 @@ function renderReminders() {
   banner.innerHTML = `<div class="reminder-title">Coming up</div>${rows}`;
 }
 
+function todayISO() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+let searchQuery = '';
+let editingId = null;
+let archivedOpen = false;
+
+function updateStats() {
+  const bar = document.getElementById('statsBar');
+  const active = state.applications.filter(a => !a.archived && a.outcome === 'none').length;
+  const offers = state.applications.filter(a => a.outcome === 'offer').length;
+  const rejected = state.applications.filter(a => a.outcome === 'rejected').length;
+  const archived = state.applications.filter(a => a.archived).length;
+  if (state.applications.length === 0) { bar.innerHTML = ''; return; }
+  bar.innerHTML = `<span><strong>${active}</strong> active</span><span><strong>${offers}</strong> offer${offers === 1 ? '' : 's'}</span><span><strong>${rejected}</strong> unsuccessful</span>` +
+    (archived > 0 ? `<span><strong>${archived}</strong> archived</span>` : '');
+}
+
+function renderArchived() {
+  const toggleWrap = document.getElementById('archivedToggleWrap');
+  const section = document.getElementById('archivedSection');
+  const archivedApps = state.applications.filter(a => a.archived);
+
+  if (archivedApps.length === 0) {
+    toggleWrap.innerHTML = '';
+    section.style.display = 'none';
+    section.innerHTML = '';
+    return;
+  }
+
+  toggleWrap.innerHTML = `<button id="archivedToggleBtn">${archivedOpen ? 'Hide' : 'Show'} archived (${archivedApps.length})</button>`;
+  document.getElementById('archivedToggleBtn').addEventListener('click', () => {
+    archivedOpen = !archivedOpen;
+    renderArchived();
+  });
+
+  if (!archivedOpen) {
+    section.style.display = 'none';
+    section.innerHTML = '';
+    return;
+  }
+
+  section.style.display = 'block';
+  section.innerHTML = '';
+  archivedApps.forEach(app => {
+    const card = document.createElement('div');
+    card.className = 'card archived-card';
+    card.innerHTML = `
+      <div class="card-head">
+        <div class="names">
+          <div class="company">${escapeHtml(app.company)}</div>
+          <div class="role">${escapeHtml(app.role || '')}</div>
+        </div>
+      </div>
+      <div class="status-row">Last stage: ${escapeHtml(STAGES[app.stageIndex])}${app.outcome !== 'none' ? ' — ' + (app.outcome === 'offer' ? 'Offer received' : 'Not successful') : ''}</div>
+      <div class="archived-actions">
+        <button class="restore-btn" data-id="${app.id}">Restore</button>
+        <button class="delete-forever" data-id="${app.id}">Delete permanently</button>
+      </div>
+    `;
+    section.appendChild(card);
+  });
+}
+
 function render() {
   const container = document.getElementById('cardsContainer');
   const empty = document.getElementById('emptyState');
   container.innerHTML = '';
   renderReminders();
+  updateStats();
+  renderArchived();
+  maybeNotify();
 
-  if (state.applications.length === 0) {
+  const visible = state.applications.filter(a => {
+    if (a.archived) return false;
+    if (searchQuery && !a.company.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    return true;
+  });
+
+  if (visible.length === 0) {
     empty.style.display = 'block';
+    empty.textContent = state.applications.length === 0
+      ? 'No applications yet — add one above to start tracking.'
+      : 'No applications match your search.';
     return;
   }
   empty.style.display = 'none';
 
-  sortForDisplay(state.applications).forEach(app => {
+  sortForDisplay(visible).forEach(app => {
     const card = document.createElement('div');
     card.className = 'card';
 
     const head = document.createElement('div');
     head.className = 'card-head';
-    head.innerHTML = `
-      <div class="names">
-        <div class="company">${escapeHtml(app.company)}</div>
-        <div class="role">${escapeHtml(app.role || '')}</div>
-      </div>
-      <button class="remove-btn" data-id="${app.id}">Remove</button>
-    `;
+    if (editingId === app.id) {
+      head.innerHTML = `
+        <div class="names name-edit" style="flex:1;">
+          <input type="text" id="edit-company-${app.id}" value="${escapeHtml(app.company)}" placeholder="Company name">
+          <input type="text" id="edit-role-${app.id}" value="${escapeHtml(app.role || '')}" placeholder="Role / scheme name">
+          <button class="save-name-btn" data-id="${app.id}">Save</button>
+        </div>
+      `;
+    } else {
+      head.innerHTML = `
+        <div class="names">
+          <div class="company">${escapeHtml(app.company)}</div>
+          <div class="role">${escapeHtml(app.role || '')}</div>
+        </div>
+        <div>
+          <button class="edit-btn" data-id="${app.id}">Edit</button>
+          <button class="archive-btn" data-id="${app.id}">Archive</button>
+        </div>
+      `;
+    }
     card.appendChild(head);
 
     const stagesEl = document.createElement('div');
@@ -589,8 +805,18 @@ function render() {
       </div>
       <label class="details-label" for="notes-${app.id}">Notes</label>
       <textarea id="notes-${app.id}" data-id="${app.id}" class="notes-input" placeholder="Contact name, salary, things to remember...">${escapeHtml(app.notes || '')}</textarea>
+      <label class="details-label" for="cv-${app.id}">CV sent</label>
+      <input type="text" id="cv-${app.id}" data-id="${app.id}" class="cv-input" placeholder="e.g. CV v3 + tailored cover letter" value="${escapeHtml(app.cvVersion || '')}">
     `;
     card.appendChild(detailsRow);
+
+    if (app.history && app.history.length > 0) {
+      const historyEl = document.createElement('details');
+      historyEl.className = 'history-details';
+      const items = app.history.map(h => `<div class="history-item">${escapeHtml(STAGES[h.stageIndex])} — ${formatDate(h.date)}</div>`).join('');
+      historyEl.innerHTML = `<summary>Stage history (${app.history.length})</summary>${items}`;
+      card.appendChild(historyEl);
+    }
 
     const outcomeRow = document.createElement('div');
     outcomeRow.className = 'outcome-buttons';
@@ -636,7 +862,11 @@ document.getElementById('addBtn').addEventListener('click', () => {
   const company = companyInput.value.trim();
   const role = roleInput.value.trim();
   if (!company) { companyInput.focus(); return; }
-  state.applications.push({ id: uid(), company, role, stageIndex: 0, outcome: 'none', date: '', link: '', notes: '' });
+  state.applications.push({
+    id: uid(), company, role, stageIndex: 0, outcome: 'none',
+    date: '', link: '', notes: '', cvVersion: '', archived: false,
+    history: [{ stageIndex: 0, date: todayISO() }]
+  });
   companyInput.value = '';
   roleInput.value = '';
   render();
@@ -669,16 +899,27 @@ document.getElementById('cardsContainer').addEventListener('input', (e) => {
   if (linkEl) {
     const app = state.applications.find(a => a.id === linkEl.dataset.id);
     if (app) app.link = linkEl.value;
+    return;
+  }
+  const cvEl = e.target.closest('.cv-input');
+  if (cvEl) {
+    const app = state.applications.find(a => a.id === cvEl.dataset.id);
+    if (app) app.cvVersion = cvEl.value;
   }
 });
 
 document.getElementById('cardsContainer').addEventListener('blur', (e) => {
   if (!e.target.classList) return;
-  if (e.target.classList.contains('notes-input') || e.target.classList.contains('link-input')) {
+  if (e.target.classList.contains('notes-input') || e.target.classList.contains('link-input') || e.target.classList.contains('cv-input')) {
     render();
     persist();
   }
 }, true);
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  searchQuery = e.target.value;
+  render();
+});
 
 document.getElementById('cardsContainer').addEventListener('click', (e) => {
   const clearBtn = e.target.closest('.clear-date');
@@ -695,7 +936,13 @@ document.getElementById('cardsContainer').addEventListener('click', (e) => {
   if (stageEl) {
     const app = state.applications.find(a => a.id === stageEl.dataset.id);
     if (app) {
-      app.stageIndex = parseInt(stageEl.dataset.stage, 10);
+      const newStage = parseInt(stageEl.dataset.stage, 10);
+      app.stageIndex = newStage;
+      if (!app.history) app.history = [];
+      const last = app.history[app.history.length - 1];
+      if (!last || last.stageIndex !== newStage) {
+        app.history.push({ stageIndex: newStage, date: todayISO() });
+      }
       render();
       persist();
     }
@@ -711,13 +958,96 @@ document.getElementById('cardsContainer').addEventListener('click', (e) => {
     }
     return;
   }
-  const removeBtn = e.target.closest('.remove-btn');
-  if (removeBtn) {
-    state.applications = state.applications.filter(a => a.id !== removeBtn.dataset.id);
+  const editBtn = e.target.closest('.edit-btn');
+  if (editBtn) {
+    editingId = editBtn.dataset.id;
+    render();
+    return;
+  }
+  const saveNameBtn = e.target.closest('.save-name-btn');
+  if (saveNameBtn) {
+    const app = state.applications.find(a => a.id === saveNameBtn.dataset.id);
+    if (app) {
+      const companyVal = document.getElementById(`edit-company-${app.id}`).value.trim();
+      const roleVal = document.getElementById(`edit-role-${app.id}`).value.trim();
+      if (companyVal) app.company = companyVal;
+      app.role = roleVal;
+    }
+    editingId = null;
+    render();
+    persist();
+    return;
+  }
+  const archiveBtn = e.target.closest('.archive-btn');
+  if (archiveBtn) {
+    const app = state.applications.find(a => a.id === archiveBtn.dataset.id);
+    if (app) app.archived = true;
     render();
     persist();
   }
 });
+
+document.getElementById('archivedSection').addEventListener('click', (e) => {
+  const restoreBtn = e.target.closest('.restore-btn');
+  if (restoreBtn) {
+    const app = state.applications.find(a => a.id === restoreBtn.dataset.id);
+    if (app) app.archived = false;
+    render();
+    persist();
+    return;
+  }
+  const deleteBtn = e.target.closest('.delete-forever');
+  if (deleteBtn) {
+    state.applications = state.applications.filter(a => a.id !== deleteBtn.dataset.id);
+    render();
+    persist();
+  }
+});
+
+// ---- Best-effort browser reminders ----
+// Only fires while this tab is open in this browser — there's no
+// background/push notification without a server component, so this
+// won't reach you if the tab or browser is closed.
+let notifiedKeys = [];
+try { notifiedKeys = JSON.parse(localStorage.getItem('notifiedKeys') || '[]'); } catch (e) { notifiedKeys = []; }
+
+function maybeNotify() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const todayStr = todayISO();
+  let changed = false;
+  getReminders().filter(r => r.diffDays === 0).forEach(({ app }) => {
+    const key = `${app.id}-${todayStr}`;
+    if (notifiedKeys.includes(key)) return;
+    try {
+      new Notification('Apprenticeship Tracker', {
+        body: `${STAGES[app.stageIndex]} with ${app.company} is today.`
+      });
+    } catch (e) { /* ignore */ }
+    notifiedKeys.push(key);
+    changed = true;
+  });
+  if (changed) {
+    try { localStorage.setItem('notifiedKeys', JSON.stringify(notifiedKeys)); } catch (e) {}
+  }
+}
+
+if ('Notification' in window) {
+  const notifyBtn = document.getElementById('notifyBtn');
+  if (Notification.permission === 'default') {
+    notifyBtn.style.display = 'inline-block';
+    notifyBtn.addEventListener('click', async () => {
+      const perm = await Notification.requestPermission();
+      if (perm === 'granted') {
+        notifyBtn.textContent = 'Reminders enabled ✓';
+        notifyBtn.disabled = true;
+        maybeNotify();
+      } else {
+        notifyBtn.style.display = 'none';
+      }
+    });
+  }
+  setInterval(maybeNotify, 60 * 60 * 1000);
+}
 
 let currentUserId = null;
 
